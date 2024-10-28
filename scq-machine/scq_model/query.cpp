@@ -1,1 +1,1 @@
-#include <scq_query.hpp>
+#include <query.hpp>
