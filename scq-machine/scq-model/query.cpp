@@ -1,4 +1,4 @@
-#include <query.hpp>
+#include "query.hpp"
 
 std::vector<std::shared_ptr<SCqBaseOperation>> const & SCqQuery::GetOperations() const
 {

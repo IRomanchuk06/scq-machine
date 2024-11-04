@@ -7,7 +7,7 @@ class SCqQuery;
 class SCqParser
 {
 public:
-    static SCqQuery Parse(std::string const & queryStr);
+    virtual SCqQuery Parse(std::string const & queryStr);
 
 private:
 };

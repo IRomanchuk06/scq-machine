@@ -1,4 +1,4 @@
-#include <argument.hpp>
+#include "argument.hpp"
 
 std::string const& SCqArgument::GetName() const {
     return name;

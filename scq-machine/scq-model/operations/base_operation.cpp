@@ -1,4 +1,4 @@
-#include <base_operation.hpp>
+#include "base_operation.hpp"
 
 SCqBaseOperation::OperationType SCqBaseOperation::GetType() const {
     return type;

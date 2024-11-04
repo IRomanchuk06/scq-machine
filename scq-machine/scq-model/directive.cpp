@@ -1,4 +1,4 @@
-#include <directive.hpp>
+#include "directive.hpp"
 
 std::string const& SCqDirective::GetName() const {
     return name;
