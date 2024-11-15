@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 #include <stdexcept>
-#include <set>
+#include <unordered_set>
 
 enum class TokenType {
     Keyword,
@@ -48,9 +48,6 @@ private:
     Token ReadVariable();
     Token ReadDirective();
 
-    static std::set<std::string> const keywords;
-    //    "query", "mutation", "subscription", "fragment", "on", "true", "false", "null"
-
-    static std::set<std::string> const outputTypes;
-    //    "String", "Int", "Float", "Boolean", "ID"
+    static std::unordered_set<std::string> const keywords;
+    static std::unordered_set<std::string> const outputTypes;
 };

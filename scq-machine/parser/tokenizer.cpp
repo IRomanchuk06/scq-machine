@@ -1,56 +1,73 @@
 #include "tokenizer.hpp"
 
 
-std::set<std::string> const Tokenizer::keywords = {
+std::unordered_set<std::string> const Tokenizer::keywords = {
     "query", "mutation", "subscription", "fragment", "on", "true", "false", "null"
 };
 
-std::set<std::string> const Tokenizer::outputTypes = {
+std::unordered_set<std::string> const Tokenizer::outputTypes = {
     "String", "Int", "Float", "Boolean", "ID"
 };
 
 std::vector<Token> Tokenizer::Tokenize()
 {
     std::vector<Token> tokens;
+
     while (position < source.size()) {
         char current = source[position];
 
         if (isspace(current)) {
             position++;
             continue;
-        } else if (current == '{') {
-            tokens.emplace_back(TokenType::CurlyBraceOpen, "{");
-            position++;
-        } else if (current == '}') {
-            tokens.emplace_back(TokenType::CurlyBraceClose, "}");
-            position++;
-        } else if (current == '(') {
-            tokens.emplace_back(TokenType::ParenOpen, "(");
-            position++;
-        } else if (current == ')') {
-            tokens.emplace_back(TokenType::ParenClose, ")");
-            position++;
-        } else if (current == ':') {
-            tokens.emplace_back(TokenType::Colon, ":");
-            position++;
-        } else if (current == ',') {
-            tokens.emplace_back(TokenType::Comma, ",");
-            position++;
-        } else if (current == '!') {
-            tokens.emplace_back(TokenType::Exclamation, "!");
-            position++;
-        } else if (current == '$') {
-            tokens.push_back(ReadVariable());
-        } else if (current == '@') {
-            tokens.push_back(ReadDirective()); 
-        } else if (isalpha(current)) {
-            tokens.push_back(ReadKeywordOrIdentifier());
-        } else if (isdigit(current) || current == '-') {
-            tokens.push_back(ReadNumber());
-        } else if (current == '\"') {
-            tokens.push_back(ReadStringLiteral());
-        } else {
-            throw std::runtime_error("Unknown character in input");
+        }
+
+        switch (current) {
+            case '{':
+                tokens.emplace_back(TokenType::CurlyBraceOpen, "{");
+                position++;
+                break;
+            case '}':
+                tokens.emplace_back(TokenType::CurlyBraceClose, "}");
+                position++;
+                break;
+            case '(':
+                tokens.emplace_back(TokenType::ParenOpen, "(");
+                position++;
+                break;
+            case ')':
+                tokens.emplace_back(TokenType::ParenClose, ")");
+                position++;
+                break;
+            case ':':
+                tokens.emplace_back(TokenType::Colon, ":");
+                position++;
+                break;
+            case ',':
+                tokens.emplace_back(TokenType::Comma, ",");
+                position++;
+                break;
+            case '!':
+                tokens.emplace_back(TokenType::Exclamation, "!");
+                position++;
+                break;
+            case '$':
+                tokens.push_back(ReadVariable());
+                break;
+            case '@':
+                tokens.push_back(ReadDirective());
+                break;
+            case '\"':
+                tokens.push_back(ReadStringLiteral());
+                break;
+            default:
+                if (isalpha(current)) {
+                    tokens.push_back(ReadKeywordOrIdentifier());
+                } else if (isdigit(current) || current == '-') {
+                    tokens.push_back(ReadNumber());
+                } else {
+                    throw std::runtime_error("Unknown character in input at position " + std::to_string(position));
+                }
+                break;
         }
     }
 
@@ -97,14 +114,39 @@ Token Tokenizer::ReadStringLiteral()
 {
     position++;
     size_t start = position;
+    std::string value;
 
-    while (position < source.size() && source[position] != '\"') {
+    while (position < source.size()) {
+        char current = source[position];
+
+        if (current == '\\') {
+            position++;
+            if (position >= source.size()) {
+                throw std::runtime_error("Unterminated escape sequence in string literal");
+            }
+            char escaped = source[position];
+            switch (escaped) {
+                case 'n': value += '\n'; break;
+                case 't': value += '\t'; break;
+                case '\\': value += '\\'; break;
+                case '\"': value += '\"'; break;
+                case 'r': value += '\r'; break;
+                case 'b': value += '\b'; break;
+                case 'f': value += '\f'; break;
+                default:
+                    throw std::runtime_error("Unknown escape sequence in string literal: \\" + std::string(1, escaped));
+            }
+        } else if (current == '\"') {
+            position++;
+            return Token(TokenType::StringLiteral, value);
+        } else {
+            value += current;
+        }
+
         position++;
     }
 
-    std::string value = source.substr(start, position - start);
-    position++;  
-    return Token(TokenType::StringLiteral, value);
+    throw std::runtime_error("Unterminated string literal");
 }
 
 Token Tokenizer::ReadVariable()

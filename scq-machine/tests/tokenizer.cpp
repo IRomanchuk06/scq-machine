@@ -93,3 +93,45 @@ TEST(TokenizerTest, UnknownCharacterThrows) {
     Tokenizer tokenizer("# unknown character");
     EXPECT_THROW(tokenizer.Tokenize(), std::runtime_error);
 }
+
+TEST(TokenizerTest, IgnoreWhitespace) {
+    Tokenizer tokenizer("query   mutation\n\tsubscription");
+    auto tokens = tokenizer.Tokenize();
+
+    ASSERT_EQ(tokens.size(), 4);
+    EXPECT_EQ(tokens[0].type, TokenType::Keyword);
+    EXPECT_EQ(tokens[0].value, "query");
+    EXPECT_EQ(tokens[1].type, TokenType::Keyword);
+    EXPECT_EQ(tokens[1].value, "mutation");
+    EXPECT_EQ(tokens[2].type, TokenType::Keyword);
+    EXPECT_EQ(tokens[2].value, "subscription");
+}
+
+TEST(TokenizerTest, InvalidCharacter) {
+    Tokenizer tokenizer("query # invalid character");
+    EXPECT_THROW(tokenizer.Tokenize(), std::runtime_error);
+}
+
+TEST(TokenizerTest, StringEscapeSequences) {
+    Tokenizer tokenizer("\"hello\\nworld\"");
+    auto tokens = tokenizer.Tokenize();
+
+    ASSERT_EQ(tokens.size(), 2);
+    EXPECT_EQ(tokens[0].type, TokenType::StringLiteral);
+    EXPECT_EQ(tokens[0].value, "hello\nworld");
+}
+
+TEST(TokenizerTest, EmptyInput) {
+    Tokenizer tokenizer("");
+    auto tokens = tokenizer.Tokenize();
+
+    ASSERT_EQ(tokens.size(), 1);
+    EXPECT_EQ(tokens[0].type, TokenType::EndOfInput);
+}
+
+TEST(TokenizerTest, UnterminatedStringLiteral) {
+    Tokenizer tokenizer("\"unfinished string");
+    EXPECT_THROW(tokenizer.Tokenize(), std::runtime_error);
+}
+
+
