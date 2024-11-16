@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../scq-model/query.hpp"
+#include "query.hpp"
 
 class SCqResolver
 {

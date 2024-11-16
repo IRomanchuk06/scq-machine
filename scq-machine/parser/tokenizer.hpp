@@ -6,21 +6,21 @@
 #include <unordered_set>
 
 enum class TokenType {
-    Keyword,
-    Identifier,
-    Variable,
-    Directive,
-    OutputType,
-    CurlyBraceOpen,
-    CurlyBraceClose,
-    ParenOpen,
-    Exclamation,
-    ParenClose,
-    Colon,
-    Comma,
-    StringLiteral,
-    Number,
-    EndOfInput
+    Keyword = 1,
+    Identifier = 2,
+    Variable = 3,
+    Directive = 4,
+    OutputType = 5,
+    CurlyBraceOpen = 6,
+    CurlyBraceClose = 7,
+    ParenOpen = 8,
+    Exclamation = 9,
+    ParenClose = 10,
+    Colon = 11,
+    Comma = 12,
+    StringLiteral = 13,
+    Number = 14,
+    EndOfInput = 15
 };
 
 struct Token {

@@ -4,7 +4,7 @@
 #include <vector>
 #include <memory>
 
-#include "../field.hpp"
+#include "field.hpp"
 
 class SCqField;
 

@@ -113,7 +113,6 @@ Token Tokenizer::ReadNumber()
 Token Tokenizer::ReadStringLiteral()
 {
     position++;
-    size_t start = position;
     std::string value;
 
     while (position < source.size()) {
@@ -124,6 +123,7 @@ Token Tokenizer::ReadStringLiteral()
             if (position >= source.size()) {
                 throw std::runtime_error("Unterminated escape sequence in string literal");
             }
+
             char escaped = source[position];
             switch (escaped) {
                 case 'n': value += '\n'; break;
@@ -134,7 +134,8 @@ Token Tokenizer::ReadStringLiteral()
                 case 'b': value += '\b'; break;
                 case 'f': value += '\f'; break;
                 default:
-                    throw std::runtime_error("Unknown escape sequence in string literal: \\" + std::string(1, escaped));
+                    throw std::runtime_error(
+                        "Unknown escape sequence in string literal: \\" + std::string(1, escaped));
             }
         } else if (current == '\"') {
             position++;
@@ -146,7 +147,7 @@ Token Tokenizer::ReadStringLiteral()
         position++;
     }
 
-    throw std::runtime_error("Unterminated string literal");
+    throw std::runtime_error("Unterminated string literal at position " + std::to_string(position));
 }
 
 Token Tokenizer::ReadVariable()

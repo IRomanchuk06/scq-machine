@@ -1,5 +1,6 @@
-#include "tokenizer.hpp"
 #include <gtest/gtest.h>
+
+#include "tokenizer.hpp"
 
 TEST(TokenizerTest, TokenizeKeywords) {
     Tokenizer tokenizer("query mutation subscription");
