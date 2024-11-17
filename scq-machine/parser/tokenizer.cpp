@@ -59,6 +59,10 @@ std::vector<Token> Tokenizer::Tokenize()
             case '\"':
                 tokens.push_back(ReadStringLiteral());
                 break;
+            case '.':
+                tokens.push_back(ReadElipsis());
+                break;
+
             default:
                 if (isalpha(current)) {
                     tokens.push_back(ReadKeywordOrIdentifier());
@@ -174,4 +178,14 @@ Token Tokenizer::ReadDirective()
 
     std::string value = source.substr(start, position - start);
     return Token(TokenType::Directive, value);
+}
+
+Token Tokenizer::ReadElipsis()
+{
+    if (position + 2 < source.size() && source[position + 1] == '.' && source[position + 2] == '.') {
+        position += 3;
+        return Token(TokenType::Ellipsis, "...");
+    } else {
+        throw std::runtime_error("Unknown character in input at position " + std::to_string(position));
+    }
 }

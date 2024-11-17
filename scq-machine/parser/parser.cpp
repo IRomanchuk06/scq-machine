@@ -136,6 +136,8 @@ std::shared_ptr<SCqNode> SCqParser::ParseArgument()
 
     argumentNode->children.push_back(ParseIdentifier());
     Expect(TokenType::Colon);
+    Advance();
+
     if (CurrentToken().type == TokenType::Number)
     {
         argumentNode->children.push_back(ParseNumber());

@@ -1,6 +1,12 @@
 #include <gtest/gtest.h>
 #include <parser.hpp>
 
+/*
+    TODO: 
+    1) EXPECT_EQ -> compare 2 vectors: result and expected 
+    
+*/ 
+
 std::vector<Token> mockTokensQuery = {
     {TokenType::Keyword, "query"},
     {TokenType::Identifier, "getUser"},
@@ -143,26 +149,33 @@ TEST(ParseTest, QueryWithArguments) {
 
     ASSERT_EQ(queryNode->children.size(), 3);
 
-    ASSERT_EQ(queryNode->children[0]->type, SCqNodeType::Field);
-    ASSERT_EQ(queryNode->children[0]->value, "id");
-
-    ASSERT_EQ(queryNode->children[1]->type, SCqNodeType::Field);
-    ASSERT_EQ(queryNode->children[1]->value, "name");
-
-    auto argumentsNode = queryNode->children[2];
+    auto argumentsNode = queryNode->children[0];
     ASSERT_EQ(argumentsNode->type, SCqNodeType::Argument);
     ASSERT_EQ(argumentsNode->children.size(), 2);
 
-    ASSERT_EQ(argumentsNode->children[0]->type, SCqNodeType::Identifier);
-    ASSERT_EQ(argumentsNode->children[0]->value, "id");
+    auto arg1 = argumentsNode->children[0];
+    auto arg2 = argumentsNode->children[1];
 
-    ASSERT_EQ(argumentsNode->children[1]->type, SCqNodeType::Number);
-    ASSERT_EQ(argumentsNode->children[1]->value, "1");
+    ASSERT_EQ(arg1->type, SCqNodeType::Argument);
+    ASSERT_EQ(arg1->children.size(), 2);
 
-    ASSERT_EQ(argumentsNode->children[2]->type, SCqNodeType::Identifier);
-    ASSERT_EQ(argumentsNode->children[2]->value, "name");
+    ASSERT_EQ(arg1->children[0]->type, SCqNodeType::Identifier);
+    ASSERT_EQ(arg1->children[0]->value, "id");
+    ASSERT_EQ(arg1->children[1]->type, SCqNodeType::Number);
+    ASSERT_EQ(arg1->children[1]->value, "1");
 
-    ASSERT_EQ(argumentsNode->children[3]->type, SCqNodeType::StringLiteral);
-    ASSERT_EQ(argumentsNode->children[3]->value, "\"John\"");
+    ASSERT_EQ(arg2->type, SCqNodeType::Argument);
+    ASSERT_EQ(arg2->children.size(), 2);
+
+    ASSERT_EQ(arg2->children[0]->type, SCqNodeType::Identifier);
+    ASSERT_EQ(arg2->children[0]->value, "name");
+    ASSERT_EQ(arg2->children[1]->type, SCqNodeType::StringLiteral);
+    ASSERT_EQ(arg2->children[1]->value, "\"John\"");
+
+    ASSERT_EQ(queryNode->children[1]->type, SCqNodeType::Field);
+    ASSERT_EQ(queryNode->children[1]->value, "id");
+
+    ASSERT_EQ(queryNode->children[2]->type, SCqNodeType::Field);
+    ASSERT_EQ(queryNode->children[2]->value, "name");
 }
 

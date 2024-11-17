@@ -20,7 +20,8 @@ enum class TokenType {
     Comma = 12,
     StringLiteral = 13,
     Number = 14,
-    EndOfInput = 15
+    EndOfInput = 15,
+    Ellipsis = 16
 };
 
 struct Token {
@@ -47,6 +48,7 @@ private:
     Token ReadStringLiteral();
     Token ReadVariable();
     Token ReadDirective();
+    Token ReadElipsis();
 
     static std::unordered_set<std::string> const keywords;
     static std::unordered_set<std::string> const outputTypes;
