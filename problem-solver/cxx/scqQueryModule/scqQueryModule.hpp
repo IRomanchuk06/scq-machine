@@ -6,15 +6,8 @@
 
 #pragma once
 
-#include <sc-memory/sc_agent.hpp>
+#include <sc-memory/sc_module.hpp>
 
-#include "keynodes/keynodes.hpp"
-
-class SubdividingSearchAgent : public ScActionInitiatedAgent
+class SCqQueryModule : public ScModule
 {
-public:
-  ScAddr GetActionClass() const;
-
-  ScResult DoProgram(ScAction & action);
 };
-

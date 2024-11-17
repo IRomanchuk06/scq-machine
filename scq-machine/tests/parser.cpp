@@ -179,3 +179,64 @@ TEST(ParseTest, QueryWithArguments) {
     ASSERT_EQ(queryNode->children[2]->value, "name");
 }
 
+/*
+First, the basic version without the fragment
+
+TEST(SCqParserTests, ParseQueryWithFragmentUsage) {
+    std::vector<Token> tokens = {
+        {TokenType::Keyword, "fragment"},
+        {TokenType::Identifier, "UserFragment"},
+        {TokenType::Keyword, "on"},
+        {TokenType::Identifier, "User"},
+        {TokenType::CurlyBraceOpen, "{"},
+        {TokenType::Identifier, "id"},
+        {TokenType::Identifier, "name"},
+        {TokenType::CurlyBraceClose, "}"},
+        {TokenType::Keyword, "query"},
+        {TokenType::Identifier, "GetUsers"},
+        {TokenType::CurlyBraceOpen, "{"},
+        {TokenType::Identifier, "users"},
+        {TokenType::CurlyBraceOpen, "{"},
+        {TokenType::Identifier, "...UserFragment"},
+        {TokenType::CurlyBraceClose, "}"},
+        {TokenType::CurlyBraceClose, "}"},
+    };
+
+    SCqParser parser(tokens);
+    auto rootNode = parser.Parse();
+
+    ASSERT_EQ(rootNode->type, SCqNodeType::Query);
+    ASSERT_EQ(rootNode->children.size(), 2);
+
+    auto fragmentNode = rootNode->children[0];
+    ASSERT_EQ(fragmentNode->type, SCqNodeType::Fragment);
+    ASSERT_EQ(fragmentNode->value, "UserFragment");
+    ASSERT_EQ(fragmentNode->children.size(), 3);
+
+    auto typeNode = fragmentNode->children[0];
+    ASSERT_EQ(typeNode->type, SCqNodeType::Type);
+    ASSERT_EQ(typeNode->value, "User");
+
+    auto field1 = fragmentNode->children[1];
+    ASSERT_EQ(field1->type, SCqNodeType::Field);
+    ASSERT_EQ(field1->value, "id");
+
+    auto field2 = fragmentNode->children[2];
+    ASSERT_EQ(field2->type, SCqNodeType::Field);
+    ASSERT_EQ(field2->value, "name");
+
+    auto queryNode = rootNode->children[1];
+    ASSERT_EQ(queryNode->type, SCqNodeType::Query);
+    ASSERT_EQ(queryNode->value, "GetUsers");
+    ASSERT_EQ(queryNode->children.size(), 1);
+
+    auto usersNode = queryNode->children[0];
+    ASSERT_EQ(usersNode->type, SCqNodeType::Field);
+    ASSERT_EQ(usersNode->value, "users");
+    ASSERT_EQ(usersNode->children.size(), 1);
+
+    auto fragmentUsageNode = usersNode->children[0];
+    ASSERT_EQ(fragmentUsageNode->type, SCqNodeType::Field);
+    ASSERT_EQ(fragmentUsageNode->value, "...UserFragment");
+}
+*/

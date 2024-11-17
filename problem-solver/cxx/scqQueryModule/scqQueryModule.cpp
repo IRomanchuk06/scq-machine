@@ -4,10 +4,9 @@
 * (See accompanying file COPYING.MIT or copy at http://opensource.org/licenses/MIT)
 */
 
-#pragma once
+#include "scqQueryModule.hpp"
 
-#include <sc-memory/sc_module.hpp>
+#include "agents/relationQueryAgent.hpp"
 
-class ExampleModule : public ScModule
-{
-};
+SC_MODULE_REGISTER(SCqQueryModule)
+->Agent<RelationQueryAgent>(); 

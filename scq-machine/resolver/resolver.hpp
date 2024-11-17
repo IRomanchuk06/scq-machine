@@ -1,11 +1,16 @@
 #pragma once
 
-#include "query.hpp"
+#include "parser.hpp"
 
 class SCqResolver
 {
 public:
-    static std::string Resolve(SCqQuery query);
+    SCqResolver(std::shared_ptr<SCqNode> const _root):
+        root(_root){};
+
+    std::string Resolve();
 
 private:
+    std::shared_ptr<SCqNode> const root;
+    
 };

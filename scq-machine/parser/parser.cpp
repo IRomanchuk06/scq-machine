@@ -118,6 +118,46 @@ std::shared_ptr<SCqNode> SCqParser::ParseSubscription()
     return subscriptionNode;
 }
 
+/*
+First, the basic version without the fragment
+
+std::shared_ptr<SCqNode> SCqParser::ParseFragment() {
+    Expect(TokenType::Keyword);
+    auto fragmentNode = std::make_shared<SCqNode>(SCqNodeType::Fragment, "");
+    Advance(); 
+
+    if (CurrentToken().type == TokenType::Identifier) {
+        fragmentNode->value = CurrentToken().value;
+        Advance();
+    } else {
+        throw std::runtime_error("Expected fragment name after 'fragment'");
+    }
+
+    Expect(TokenType::Keyword); 
+    Advance();
+
+    if (CurrentToken().type == TokenType::Identifier) {
+        auto typeNode = std::make_shared<SCqNode>(SCqNodeType::Type, CurrentToken().value);
+        fragmentNode->children.push_back(typeNode);
+        Advance();
+    } else {
+        throw std::runtime_error("Expected type name after 'on'");
+    }
+
+    Expect(TokenType::CurlyBraceOpen);
+    Advance();
+
+    while (CurrentToken().type == TokenType::Identifier) {
+        fragmentNode->children.push_back(ParseField()); 
+    }
+
+    Expect(TokenType::CurlyBraceClose);
+    Advance();
+
+    return fragmentNode;
+}
+*/
+
 std::shared_ptr<SCqNode> SCqParser::ParseField()
 {
     auto fieldNode = std::make_shared<SCqNode>(SCqNodeType::Field, CurrentToken().value);

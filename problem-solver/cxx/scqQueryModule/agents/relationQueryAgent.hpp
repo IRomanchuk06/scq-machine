@@ -10,18 +10,10 @@
 
 #include "keynodes/keynodes.hpp"
 
-class IsomorphicSearchAgent : public ScActionInitiatedAgent
+class RelationQueryAgent : public ScActionInitiatedAgent
 {
 public:
   ScAddr GetActionClass() const;
 
   ScResult DoProgram(ScAction & action);
-
-  void formSearchResults(ScAddr const & scTemplateNode, ScStructure & result);
-
-  void clearPreviousSearchResults(ScAddr const & scTemplate);
-
-  ScAddr formNewResultsSetConstruction(ScAddr const & scTemplate, ScStructure & result);
-
-  ScAddr emplaceItemElementsInStructure(ScTemplateSearchResultItem const & item);
 };

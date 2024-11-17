@@ -3,6 +3,8 @@
 #include "query.hpp"
 #include "tokenizer.hpp"
 
+#include <unordered_map>
+
 class SCqQuery;
 
 enum class SCqNodeType {
@@ -15,7 +17,9 @@ enum class SCqNodeType {
     StringLiteral = 6,
     Identifier = 7,
     Directive = 8,
-    Number = 9
+    Number = 9,
+    Type = 10,
+    Fragment = 11
 };
 
 struct SCqNode {
@@ -29,18 +33,19 @@ struct SCqNode {
 class SCqParser
 {
 public:
-    SCqParser(const std::vector<Token>& tokens): 
-        tokens(tokens), position(0) {};
+    SCqParser(const std::vector<Token>& _tokens): 
+        tokens(_tokens), position(0) {};
 
     std::shared_ptr<SCqNode> Parse();
 
 private:
-    const std::vector<Token>& tokens;
+    std::vector<Token> const& tokens;
     size_t position;
 
     std::shared_ptr<SCqNode> ParseQuery();
     std::shared_ptr<SCqNode> ParseMutation();
     std::shared_ptr<SCqNode> ParseSubscription();
+    //std::shared_ptr<SCqNode> ParseFragment();
     std::shared_ptr<SCqNode> ParseField();
     std::shared_ptr<SCqNode> ParseArgument();
     std::shared_ptr<SCqNode> ParseVariable();
