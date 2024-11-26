@@ -16,4 +16,6 @@ public:
   ScAddr GetActionClass() const;
 
   ScResult DoProgram(ScAction & action);
+
+  void FindNodesFromRel(ScAddr const & node, ScAddr const & rel, ScAddr const &foundNodeStruct);
 };
