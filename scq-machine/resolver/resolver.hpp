@@ -2,6 +2,8 @@
 
 #include "parser.hpp"
 
+//#include <sc-memory/sc_memory.hpp>
+
 class SCqResolver
 {
 public:

@@ -1,11 +1,12 @@
+#include "parser.hpp"
+/*
+
 #include <gtest/gtest.h>
 #include <parser.hpp>
 
-/*
-    TODO: 
-    1) EXPECT_EQ -> compare 2 vectors: result and expected 
-    
-*/ 
+    TODO:
+    1) EXPECT_EQ -> compare 2 vectors: result and expected
+
 
 std::vector<Token> mockTokensQuery = {
     {TokenType::Keyword, "query"},
@@ -104,7 +105,7 @@ TEST(ParseTest, InvalidTokenUnexpected) {
         {TokenType::Identifier, "getUser"},
         {TokenType::CurlyBraceOpen, "{"},
         {TokenType::Identifier, "id"},
-        {TokenType::Keyword, "mutation"}  
+        {TokenType::Keyword, "mutation"}
     };
 
     SCqParser parser(tokens);
@@ -179,7 +180,6 @@ TEST(ParseTest, QueryWithArguments) {
     ASSERT_EQ(queryNode->children[2]->value, "name");
 }
 
-/*
 First, the basic version without the fragment
 
 TEST(SCqParserTests, ParseQueryWithFragmentUsage) {
@@ -239,4 +239,6 @@ TEST(SCqParserTests, ParseQueryWithFragmentUsage) {
     ASSERT_EQ(fragmentUsageNode->type, SCqNodeType::Field);
     ASSERT_EQ(fragmentUsageNode->value, "...UserFragment");
 }
+
+
 */

@@ -1,60 +1,42 @@
 #pragma once
 
-#include "query.hpp"
-#include "tokenizer.hpp"
+#include "../tokenizer/tokenizer.hpp"
+#include "scq_node.hpp"
 
+#include <iostream>
 #include <unordered_map>
 
-class SCqQuery;
-
-enum class SCqNodeType {
-    Query = 0,
-    Mutation = 1,
-    Subscription = 2,
-    Variable = 3,
-    Field = 4,
-    Argument = 5,
-    StringLiteral = 6,
-    Identifier = 7,
-    Directive = 8,
-    Number = 9,
-    Type = 10,
-    Fragment = 11
-};
-
-struct SCqNode {
-    SCqNodeType type;
-    std::string value;
-    std::vector<std::shared_ptr<SCqNode>> children;
-
-    SCqNode(SCqNodeType type, const std::string& value = "") : type(type), value(value) {}
-};
-
-class SCqParser
+struct SCqParserContext
 {
-public:
-    SCqParser(const std::vector<Token>& _tokens): 
-        tokens(_tokens), position(0) {};
+    size_t position = 0; 
+    const std::vector<Token>& tokens;
+    
+    std::unordered_map<std::string, std::shared_ptr<SCqNode>> fragments;
 
-    std::shared_ptr<SCqNode> Parse();
+    explicit SCqParserContext(const std::vector<Token>& tokens) : tokens(tokens) {}
 
-private:
-    std::vector<Token> const& tokens;
-    size_t position;
 
-    std::shared_ptr<SCqNode> ParseQuery();
-    std::shared_ptr<SCqNode> ParseMutation();
-    std::shared_ptr<SCqNode> ParseSubscription();
-    //std::shared_ptr<SCqNode> ParseFragment();
-    std::shared_ptr<SCqNode> ParseField();
-    std::shared_ptr<SCqNode> ParseArgument();
-    std::shared_ptr<SCqNode> ParseVariable();
-    std::shared_ptr<SCqNode> ParseStringLiteral();
-    std::shared_ptr<SCqNode> ParseNumber();
-    std::shared_ptr<SCqNode> ParseIdentifier();
-
-    Token CurrentToken() const;
-
-    void Expect(TokenType type);
+    Token const& CurrentToken() const;
     void Advance();
+    bool ExpectToken(TokenType const& expectedToken) const;
+
+    void AddFragment(std::string const & fragmentName, std::shared_ptr<SCqNode> fragment);
+    
+    bool const IsTokensEmpty() const;
+    bool const IsEnd() const;
 };
+
+class SCqParser {
+protected:
+    SCqParserContext& parseContext;
+
+public:
+    explicit SCqParser(SCqParserContext & _parseContext) : parseContext(_parseContext) {}
+    virtual ~SCqParser() = default;
+
+    virtual std::shared_ptr<SCqNode> Parse();
+};
+
+#include "operations/query/query_parser.hpp"
+#include "operations/mutation/mutation_parser.hpp"
+#include "operations/subscription/subscription_parser.hpp"
