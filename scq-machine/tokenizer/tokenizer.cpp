@@ -23,31 +23,31 @@ std::vector<Token> Tokenizer::Tokenize()
 
         switch (current) {
             case '{':
-                tokens.emplace_back(TokenType::CurlyBraceOpen, "{");
+                tokens.emplace_back(SCqTokenType::CurlyBraceOpen, "{");
                 position++;
                 break;
             case '}':
-                tokens.emplace_back(TokenType::CurlyBraceClose, "}");
+                tokens.emplace_back(SCqTokenType::CurlyBraceClose, "}");
                 position++;
                 break;
             case '(':
-                tokens.emplace_back(TokenType::ParenOpen, "(");
+                tokens.emplace_back(SCqTokenType::ParenOpen, "(");
                 position++;
                 break;
             case ')':
-                tokens.emplace_back(TokenType::ParenClose, ")");
+                tokens.emplace_back(SCqTokenType::ParenClose, ")");
                 position++;
                 break;
             case ':':
-                tokens.emplace_back(TokenType::Colon, ":");
+                tokens.emplace_back(SCqTokenType::Colon, ":");
                 position++;
                 break;
             case ',':
-                tokens.emplace_back(TokenType::Comma, ",");
+                tokens.emplace_back(SCqTokenType::Comma, ",");
                 position++;
                 break;
             case '!':
-                tokens.emplace_back(TokenType::Exclamation, "!");
+                tokens.emplace_back(SCqTokenType::Exclamation, "!");
                 position++;
                 break;
             case '$':
@@ -75,7 +75,7 @@ std::vector<Token> Tokenizer::Tokenize()
         }
     }
 
-    tokens.emplace_back(TokenType::EndOfInput, "");
+    tokens.emplace_back(SCqTokenType::EndOfInput, "");
     return tokens;
 }
 
@@ -92,14 +92,14 @@ Token Tokenizer::ReadKeywordOrIdentifier()
 
     if (keywords.find(value) != keywords.end())
     {
-        return Token(TokenType::Keyword, value);
+        return Token(SCqTokenType::Keyword, value);
     } 
     else if (outputTypes.find(value) != outputTypes.end())
     {
-        return Token(TokenType::OutputType, value);
+        return Token(SCqTokenType::OutputType, value);
     }
 
-    return Token(TokenType::Identifier, value);
+    return Token(SCqTokenType::Identifier, value);
 }
 
 Token Tokenizer::ReadNumber()
@@ -111,7 +111,7 @@ Token Tokenizer::ReadNumber()
     }
 
     std::string value = source.substr(start, position - start);
-    return Token(TokenType::Number, value);
+    return Token(SCqTokenType::Number, value);
 }
 
 Token Tokenizer::ReadStringLiteral()
@@ -143,7 +143,7 @@ Token Tokenizer::ReadStringLiteral()
             }
         } else if (current == '\"') {
             position++;
-            return Token(TokenType::StringLiteral, value);
+            return Token(SCqTokenType::StringLiteral, value);
         } else {
             value += current;
         }
@@ -164,7 +164,7 @@ Token Tokenizer::ReadVariable()
     }
 
     std::string value = source.substr(start, position - start);
-    return Token(TokenType::Variable, value);
+    return Token(SCqTokenType::Variable, value);
 }
 
 Token Tokenizer::ReadDirective() 
@@ -177,14 +177,14 @@ Token Tokenizer::ReadDirective()
     }
 
     std::string value = source.substr(start, position - start);
-    return Token(TokenType::Directive, value);
+    return Token(SCqTokenType::Directive, value);
 }
 
 Token Tokenizer::ReadElipsis()
 {
     if (position + 2 < source.size() && source[position + 1] == '.' && source[position + 2] == '.') {
         position += 3;
-        return Token(TokenType::Ellipsis, "...");
+        return Token(SCqTokenType::Ellipsis, "...");
     } else {
         throw std::runtime_error("Unknown character in input at position " + std::to_string(position));
     }

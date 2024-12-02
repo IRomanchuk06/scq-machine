@@ -1,7 +1,14 @@
-#include "parser.hpp"
+#include <gtest/gtest.h>
+#include "../parser/parser.hpp"
+
+#include "../tokenizer/tokenizer.hpp"
+
+
+
+
+
 /*
 
-#include <gtest/gtest.h>
 #include <parser.hpp>
 
     TODO:
@@ -242,3 +249,4 @@ TEST(SCqParserTests, ParseQueryWithFragmentUsage) {
 
 
 */
+

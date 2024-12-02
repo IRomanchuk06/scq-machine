@@ -5,6 +5,7 @@
 #include <memory>
 
 enum class SCqNodeType {
+    Entity,
     Query,
     Mutation,
     Subscription,
@@ -24,6 +25,7 @@ public:
     std::string value;
     std::vector<std::shared_ptr<SCqNode>> children;
 
-    SCqNode(SCqNodeType const & type, std::string const & value = "")
+    SCqNode(SCqNodeType const& type, std::string const & value = "")
         : type(type), value(value) {}
+
 };

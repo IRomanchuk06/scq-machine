@@ -5,7 +5,9 @@
 #include <stdexcept>
 #include <unordered_set>
 
-enum class TokenType {
+// TODO: do I need different types for args values?
+// TODO: i think i need just 1 type of arg (system idtf = str)
+enum class SCqTokenType {
     Keyword = 1,
     Identifier = 2,
     Variable = 3,
@@ -25,10 +27,10 @@ enum class TokenType {
 };
 
 struct Token {
-    TokenType type;
+    SCqTokenType type;
     std::string value;
 
-    Token(TokenType type, std::string const & value) : type(type), value(value) {}
+    Token(SCqTokenType type, std::string const & value) : type(type), value(value) {}
 };
 
 class Tokenizer
