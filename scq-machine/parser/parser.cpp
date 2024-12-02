@@ -1,5 +1,6 @@
 #include "parser.hpp"
 
+#include "fragment_parser.hpp"
 #include "operation_parser.hpp"
 
 std::shared_ptr<SCqNode> SCqParser::Parse()
@@ -26,7 +27,9 @@ std::shared_ptr<SCqNode> SCqParser::Parse()
             }
             else if (tokenValue == "fragment")
             {
-                
+                SCqFragmentParser fragmentParser(context);
+                std::shared_ptr<SCqNode> fragment = fragmentParser.Parse();
+                context.AddFragment(fragment->value, fragment);
             }
         }
 

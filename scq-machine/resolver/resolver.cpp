@@ -6,6 +6,34 @@
 
 std::string SCqResolver::Resolve()
 {
+    for(auto const & operation : root->children)
+    {
+        SCqNodeType operationType = operation->type;
+        ScAddr agentResult;
+
+        switch (operationType)
+        {
+        case SCqNodeType::Query:
+            agentResult = LaunchQueryAgent(operation);
+            break;
+
+        case SCqNodeType::Mutation:
+            agentResult = LaunchMutationAgent(operation);
+            break;
+
+        case SCqNodeType::Subscription:
+            agentResult = LaunchSubscriptionAgent(operation);
+            break;
+        
+        default:
+            break;
+        }
+    }
+
+
+
+
+    /*
     auto entity = root->children[0];
     std::string entityName = entity->value;
 
@@ -39,4 +67,25 @@ std::string SCqResolver::Resolve()
     context.GenerateConnector(ScType::EdgeAccessConstPosPerm, ScKeynodes::action_initiated, actionNode);
 
     return nullptr;
+    */   
+}
+
+ScAddr const &SCqResolver::LaunchQueryAgent(std::shared_ptr<SCqNode> operationRoot)
+{
+    std::vector<std::shared_ptr<SCqNode>> entities = operationRoot->children;
+
+    for (auto const & entity: entities)
+    {
+        
+    }
+}
+
+ScAddr const &SCqResolver::LaunchMutationAgent(std::shared_ptr<SCqNode> operationRoot)
+{
+    
+}
+
+ScAddr const &SCqResolver::LaunchSubscriptionAgent(std::shared_ptr<SCqNode> operationRoot)
+{
+    
 }

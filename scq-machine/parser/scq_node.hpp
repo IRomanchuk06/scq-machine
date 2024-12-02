@@ -19,13 +19,12 @@ enum class SCqNodeType {
     Type
 };
 
-class SCqNode {
-public:
+struct SCqNode
+{
     SCqNodeType type;
     std::string value;
     std::vector<std::shared_ptr<SCqNode>> children;
 
     SCqNode(SCqNodeType const& type, std::string const & value = "")
         : type(type), value(value) {}
-
 };

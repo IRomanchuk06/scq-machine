@@ -5,8 +5,13 @@
 #include <stdexcept>
 #include <unordered_set>
 
-// TODO: do I need different types for args values?
-// TODO: i think i need just 1 type of arg (system idtf = str)
+/*
+
+ TODO: 
+    one type of arg - str (system idtf), num and string => SystemIdtf
+    identifier => SystemIdtf?
+
+*/
 enum class SCqTokenType {
     Keyword = 1,
     Identifier = 2,

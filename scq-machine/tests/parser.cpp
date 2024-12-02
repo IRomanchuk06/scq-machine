@@ -35,6 +35,7 @@ TEST(SCqParserTests, ValidQuery)
 
     ASSERT_EQ(root->children.size(), 1);
     ASSERT_EQ(root->children[0]->value, "userDetails");
+    ASSERT_EQ(root->children[0]->type, SCqNodeType::Entity);
 
     ASSERT_EQ(root->children[0]->children.size(), 2);
     ASSERT_EQ(root->children[0]->children[0]->type, SCqNodeType::Field);
@@ -45,6 +46,49 @@ TEST(SCqParserTests, ValidQuery)
     ASSERT_EQ(root->children[0]->children[1]->type, SCqNodeType::Field);
     ASSERT_EQ(root->children[0]->children[1]->value, "name");
 };
+
+TEST(SCqParserTests, FragmentTest)
+{
+    std::vector<Token> query = {
+        {SCqTokenType::Keyword, "fragment"},
+        {SCqTokenType::Identifier, "userDetailsFragment"},
+        {SCqTokenType::CurlyBraceOpen, "{"},
+        {SCqTokenType::Identifier, "id"},
+        {SCqTokenType::Identifier, "name"},
+        {SCqTokenType::CurlyBraceClose, "}"},
+        {SCqTokenType::Keyword, "query"},
+        {SCqTokenType::Identifier, "getUser"},
+        {SCqTokenType::CurlyBraceOpen, "{"},
+        {SCqTokenType::Identifier, "user"},
+        {SCqTokenType::CurlyBraceOpen, "{"},
+        {SCqTokenType::Ellipsis, "..."},
+        {SCqTokenType::Identifier, "userDetailsFragment"},
+        {SCqTokenType::CurlyBraceClose, "}"},
+        {SCqTokenType::CurlyBraceClose, "}"}
+    };
+
+    SCqParserContext context(query);
+
+    SCqParser parser(context);
+    auto root = parser.Parse()->children[0];
+
+    ASSERT_NE(root, nullptr);
+    ASSERT_EQ(root->type, SCqNodeType::Query);
+    ASSERT_EQ(root->value, "getUser");
+
+    ASSERT_EQ(root->children.size(), 1);
+    ASSERT_EQ(root->children[0]->value, "user");
+    ASSERT_EQ(root->children[0]->type, SCqNodeType::Entity);
+
+    ASSERT_EQ(root->children[0]->children.size(), 1);
+    ASSERT_EQ(root->children[0]->children[0]->type, SCqNodeType::Fragment);
+    ASSERT_EQ(root->children[0]->children[0]->value, "userDetailsFragment");
+
+    ASSERT_EQ(root->children[0]->children[0]->children[0]->type, SCqNodeType::Field);
+    ASSERT_EQ(root->children[0]->children[0]->children[0]->value, "id");
+    ASSERT_EQ(root->children[0]->children[0]->children[1]->type, SCqNodeType::Field);
+    ASSERT_EQ(root->children[0]->children[0]->children[1]->value, "name");
+}
 
 /*
 

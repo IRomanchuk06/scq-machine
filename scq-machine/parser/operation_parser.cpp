@@ -129,6 +129,17 @@ void SCqOperationParser::ParseFieldArguments()
 
 std::shared_ptr<SCqNode> SCqOperationParser::ParseField()
 {
+    if(context.CurrentToken().type == SCqTokenType::Ellipsis)
+    {
+        context.Advance();
+        context.ExpectToken(SCqTokenType::Identifier);
+
+        std::string fragmentName = context.CurrentToken().value;
+        context.Advance();
+
+        return context.GetFragment(fragmentName);
+    }
+
     context.ExpectToken(SCqTokenType::Identifier);
     std::string fieldName = context.CurrentToken().value;
     context.Advance();
