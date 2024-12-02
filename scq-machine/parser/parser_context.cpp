@@ -35,12 +35,20 @@ void SCqParserContext::AddFragment(std::string const &fragmentName, std::shared_
     fragments[fragmentName] = fragment;
 }
 
-bool const SCqParserContext::IsTokensEmpty() const
+std::shared_ptr<SCqNode> SCqParserContext::GetFragment(const std::string& fragmentName) const {
+    auto it = fragments.find(fragmentName);
+    if (it != fragments.end()) {
+        return it->second;
+    }
+    return nullptr; 
+}
+
+bool SCqParserContext::IsTokensEmpty() const
 {
     return tokens.empty();
 }
 
-bool const SCqParserContext::IsEnd() const
+bool SCqParserContext::IsEnd() const
 {
-    return position > tokens.size();
+    return position+1 >= tokens.size();
 }

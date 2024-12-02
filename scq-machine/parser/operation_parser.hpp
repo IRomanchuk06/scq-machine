@@ -2,18 +2,24 @@
 
 #include "scq_node.hpp"
 #include "parser_context.hpp"
+#include "parser.hpp"
 
-class SCqOperationParser
+#include <algorithm>
+#include <cctype>
+
+class SCqOperationParser : public SCqParser
 {
 public:
-    std::shared_ptr<SCqNode> Parse(SCqParserContext & context);
+    explicit SCqOperationParser(SCqParserContext& _context) : SCqParser(_context){}
+
+    std::shared_ptr<SCqNode> Parse() override;
 
 private:
     std::unordered_map<std::string, std::string> arguments;
 
-    SCqNodeType GetOperationSCqTypeFromOperationName(std::string const & operationStr);
-    std::shared_ptr<SCqNode> ParseEntity(SCqParserContext & context);
-    std::shared_ptr<SCqNode> ParseField(SCqParserContext & context);
+    SCqNodeType GetOperationSCqTypeFromOperationName(std::string const& operationName);
+    std::shared_ptr<SCqNode> ParseEntity();
+    std::shared_ptr<SCqNode> ParseField();
     
-    void ParseFieldArguments(SCqParserContext & context);
+    void ParseFieldArguments();
 };

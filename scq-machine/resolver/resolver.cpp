@@ -38,5 +38,5 @@ std::string SCqResolver::Resolve()
 
     context.GenerateConnector(ScType::EdgeAccessConstPosPerm, ScKeynodes::action_initiated, actionNode);
 
-    
+    return nullptr;
 }

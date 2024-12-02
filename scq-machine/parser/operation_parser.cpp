@@ -16,11 +16,11 @@ operationType operationName(optional) ($variables(optional): VariableType)
 
 // TODO: add vars handling
 
-std::shared_ptr<SCqNode> SCqOperationParser::Parse(SCqParserContext &context)
+std::shared_ptr<SCqNode> SCqOperationParser::Parse()
 {
     context.ExpectToken(SCqTokenType::Keyword);
     auto operationRoot = std::make_shared<SCqNode>(GetOperationSCqTypeFromOperationName(context.CurrentToken().value));
-    context.Advance();
+    context.Advance(); 
 
     // operation name (optional)
     if(context.CurrentToken().type == SCqTokenType::Identifier)
@@ -40,33 +40,39 @@ std::shared_ptr<SCqNode> SCqOperationParser::Parse(SCqParserContext &context)
 
     while(context.CurrentToken().type != SCqTokenType::CurlyBraceClose)
     {
-        ParseEntity(context);
+        operationRoot->children.push_back(ParseEntity());
     }
 
-    return nullptr;
+    context.Advance();
+
+    return operationRoot;
 }
 
 SCqNodeType SCqOperationParser::GetOperationSCqTypeFromOperationName(std::string const &operationName)
 {
-    if(operationName == "Query")
+    std::string lowerOperationName = operationName;
+    std::transform(lowerOperationName.begin(), lowerOperationName.end(), lowerOperationName.begin(),
+                   [](unsigned char c) { return std::tolower(c); });
+
+    if (lowerOperationName == "query")
     {
         return SCqNodeType::Query;
     }
-    else if(operationName == "Mutation")
+    else if (lowerOperationName == "mutation")
     {
         return SCqNodeType::Mutation;
     }
-    else if(operationName == "Subscription")
+    else if (lowerOperationName == "subscription")
     {
         return SCqNodeType::Subscription;
     }
     else
     {
-        return;
+        return SCqNodeType::Field;
     }
 }
 
-std::shared_ptr<SCqNode> SCqOperationParser::ParseEntity(SCqParserContext &context)
+std::shared_ptr<SCqNode> SCqOperationParser::ParseEntity()
 {
     context.ExpectToken(SCqTokenType::Identifier);
     auto entityRoot = std::make_shared<SCqNode>(SCqNodeType::Entity, context.CurrentToken().value);
@@ -75,7 +81,7 @@ std::shared_ptr<SCqNode> SCqOperationParser::ParseEntity(SCqParserContext &conte
     // args for entity fields
     if(context.CurrentToken().type == SCqTokenType::ParenOpen)
     {
-        ParseFieldArguments(context);
+        ParseFieldArguments();
     }
 
     context.ExpectToken(SCqTokenType::CurlyBraceOpen);
@@ -84,7 +90,7 @@ std::shared_ptr<SCqNode> SCqOperationParser::ParseEntity(SCqParserContext &conte
     // handle fields for entity
     while(context.CurrentToken().type != SCqTokenType::CurlyBraceClose)
     {
-        ParseField(context);
+        entityRoot->children.push_back(ParseField());
     }
 
     context.Advance();
@@ -92,7 +98,7 @@ std::shared_ptr<SCqNode> SCqOperationParser::ParseEntity(SCqParserContext &conte
     return entityRoot;
 }
 
-void SCqOperationParser::ParseFieldArguments(SCqParserContext &context)
+void SCqOperationParser::ParseFieldArguments()
 {
     context.Advance();
 
@@ -101,13 +107,14 @@ void SCqOperationParser::ParseFieldArguments(SCqParserContext &context)
         context.ExpectToken(SCqTokenType::Identifier);
         
         std::string argName = context.CurrentToken().value;
-
         context.Advance();
+
         context.ExpectToken(SCqTokenType::Colon);
         context.Advance();
         context.ExpectToken(SCqTokenType::StringLiteral);
 
         std::string argValue = context.CurrentToken().value;
+        context.Advance();
 
         arguments[argName] = argValue;
 
@@ -117,15 +124,14 @@ void SCqOperationParser::ParseFieldArguments(SCqParserContext &context)
             context.Advance();
         }
     }
-
     context.Advance();
 }
 
-std::shared_ptr<SCqNode> SCqOperationParser::ParseField(SCqParserContext &context)
+std::shared_ptr<SCqNode> SCqOperationParser::ParseField()
 {
     context.ExpectToken(SCqTokenType::Identifier);
-
     std::string fieldName = context.CurrentToken().value;
+    context.Advance();
 
     auto fieldRoot = std::make_shared<SCqNode>(SCqNodeType::Field, fieldName);
 
@@ -141,8 +147,8 @@ std::shared_ptr<SCqNode> SCqOperationParser::ParseField(SCqParserContext &contex
         context.Advance();
         while (context.CurrentToken().type != SCqTokenType::CurlyBraceClose)
         {
-            fieldRoot->children.push_back(ParseField(context));
-        }   
+            fieldRoot->children.push_back(ParseField());
+        }
         context.Advance();
     }
 

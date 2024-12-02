@@ -6,22 +6,24 @@
 #include <unordered_map>
 #include <iostream>
 
-struct SCqParserContext
+class SCqParserContext
 {
-    size_t position = 0; 
-    const std::vector<Token>& tokens;
-    
-    std::unordered_map<std::string, std::shared_ptr<SCqNode>> fragments;
-
-    explicit SCqParserContext(const std::vector<Token>& tokens) : tokens(tokens) {}
-
+public:
+    explicit SCqParserContext(const std::vector<Token>& tokens)
+        : position(0), tokens(tokens) {}
 
     Token const& CurrentToken() const;
     void Advance();
     bool ExpectToken(SCqTokenType const& expectedToken) const;
 
-    void AddFragment(std::string const & fragmentName, std::shared_ptr<SCqNode> fragment);
-    
-    bool const IsTokensEmpty() const;
-    bool const IsEnd() const;
+    void AddFragment(const std::string& fragmentName, std::shared_ptr<SCqNode> fragment);
+    std::shared_ptr<SCqNode> GetFragment(const std::string& fragmentName) const;
+
+    bool IsTokensEmpty() const;
+    bool IsEnd() const;
+
+private:
+    size_t position;
+    const std::vector<Token>& tokens;
+    std::unordered_map<std::string, std::shared_ptr<SCqNode>> fragments;
 };
