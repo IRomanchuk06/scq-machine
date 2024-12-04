@@ -1,15 +1,13 @@
 #include "tokenizer.hpp"
 
 
-std::unordered_set<std::string> const Tokenizer::keywords = {
-    "query", "mutation", "subscription", "fragment", "on", "true", "false", "null"
+std::unordered_set<std::string> const SCqTokenizer::keywords = {
+    "QueryRelatedEntities", "QueryEntityClasses", "MutationEntityClasses", "MutationRelatedEntities",
+
+    "fragment", "on", "true", "false", "null"
 };
 
-std::unordered_set<std::string> const Tokenizer::outputTypes = {
-    "String", "Int", "Float", "Boolean", "ID"
-};
-
-std::vector<Token> Tokenizer::Tokenize()
+std::vector<Token> SCqTokenizer::Tokenize()
 {
     std::vector<Token> tokens;
 
@@ -38,6 +36,14 @@ std::vector<Token> Tokenizer::Tokenize()
                 tokens.emplace_back(SCqTokenType::ParenClose, ")");
                 position++;
                 break;
+            case '[':
+                tokens.emplace_back(SCqTokenType::SquareBraceOpen, "[");
+                position++;
+                break;
+            case ']':
+                tokens.emplace_back(SCqTokenType::SquareBraceClose, "]");
+                position++;
+                break;
             case ':':
                 tokens.emplace_back(SCqTokenType::Colon, ":");
                 position++;
@@ -45,16 +51,6 @@ std::vector<Token> Tokenizer::Tokenize()
             case ',':
                 tokens.emplace_back(SCqTokenType::Comma, ",");
                 position++;
-                break;
-            case '!':
-                tokens.emplace_back(SCqTokenType::Exclamation, "!");
-                position++;
-                break;
-            case '$':
-                tokens.push_back(ReadVariable());
-                break;
-            case '@':
-                tokens.push_back(ReadDirective());
                 break;
             case '\"':
                 tokens.push_back(ReadStringLiteral());
@@ -66,8 +62,6 @@ std::vector<Token> Tokenizer::Tokenize()
             default:
                 if (isalpha(current)) {
                     tokens.push_back(ReadKeywordOrIdentifier());
-                } else if (isdigit(current) || current == '-') {
-                    tokens.push_back(ReadNumber());
                 } else {
                     throw std::runtime_error("Unknown character in input at position " + std::to_string(position));
                 }
@@ -79,7 +73,7 @@ std::vector<Token> Tokenizer::Tokenize()
     return tokens;
 }
 
-Token Tokenizer::ReadKeywordOrIdentifier()
+Token SCqTokenizer::ReadKeywordOrIdentifier()
 {
     size_t start = position;
 
@@ -93,28 +87,12 @@ Token Tokenizer::ReadKeywordOrIdentifier()
     if (keywords.find(value) != keywords.end())
     {
         return Token(SCqTokenType::Keyword, value);
-    } 
-    else if (outputTypes.find(value) != outputTypes.end())
-    {
-        return Token(SCqTokenType::OutputType, value);
     }
 
     return Token(SCqTokenType::Identifier, value);
 }
 
-Token Tokenizer::ReadNumber()
-{
-    size_t start = position;
-
-    while (position < source.size() && isdigit(source[position])) {
-        position++;
-    }
-
-    std::string value = source.substr(start, position - start);
-    return Token(SCqTokenType::Number, value);
-}
-
-Token Tokenizer::ReadStringLiteral()
+Token SCqTokenizer::ReadStringLiteral()
 {
     position++;
     std::string value;
@@ -154,33 +132,7 @@ Token Tokenizer::ReadStringLiteral()
     throw std::runtime_error("Unterminated string literal at position " + std::to_string(position));
 }
 
-Token Tokenizer::ReadVariable()
-{
-    position++;
-    size_t start = position;
-
-    while (position < source.size() && (isalnum(source[position]) || source[position] == '_')) {
-        position++;
-    }
-
-    std::string value = source.substr(start, position - start);
-    return Token(SCqTokenType::Variable, value);
-}
-
-Token Tokenizer::ReadDirective() 
-{
-    position++; 
-    size_t start = position;
-    
-    while (position < source.size() && (isalnum(source[position]) || source[position] == '_')) {
-        position++;
-    }
-
-    std::string value = source.substr(start, position - start);
-    return Token(SCqTokenType::Directive, value);
-}
-
-Token Tokenizer::ReadElipsis()
+Token SCqTokenizer::ReadElipsis()
 {
     if (position + 2 < source.size() && source[position + 1] == '.' && source[position + 2] == '.') {
         position += 3;

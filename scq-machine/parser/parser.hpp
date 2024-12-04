@@ -12,6 +12,8 @@ class ScqParserContext;
 class SCqParser {
 protected:
     SCqParserContext& context;
+    static std::unordered_set<std::string> const queryOperations;
+    static std::unordered_set<std::string> const mutationOperations;
 
 public:
     explicit SCqParser(SCqParserContext & _context) : context(_context) {}

@@ -15,7 +15,7 @@ public:
     std::shared_ptr<SCqNode> Parse() override;
 
 private:
-    std::unordered_map<std::string, std::string> arguments;
+    std::unordered_map<std::string, std::vector<std::string>> arguments;
 
     SCqNodeType GetOperationSCqTypeFromOperationName(std::string const& operationName);
     std::shared_ptr<SCqNode> ParseEntity();

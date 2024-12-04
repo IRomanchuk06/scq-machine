@@ -2,7 +2,7 @@
 
 /*
 
-operationType operationName(optional) ($variables(optional): VariableType)
+operationType operationName(optional)
 {
   fieldName(argumentName: argumentValue) {
     subField1
@@ -13,8 +13,6 @@ operationType operationName(optional) ($variables(optional): VariableType)
 }
 
 */
-
-// TODO: add vars handling
 
 std::shared_ptr<SCqNode> SCqOperationParser::Parse()
 {
@@ -27,12 +25,6 @@ std::shared_ptr<SCqNode> SCqOperationParser::Parse()
     {
         operationRoot->value=context.CurrentToken().value;
         context.Advance();
-    }
-
-    // operation vars (optional)
-    if(context.CurrentToken().type == SCqTokenType::ParenOpen)
-    {
-        // func to handle vars
     }
 
     context.ExpectToken(SCqTokenType::CurlyBraceOpen);
@@ -50,21 +42,13 @@ std::shared_ptr<SCqNode> SCqOperationParser::Parse()
 
 SCqNodeType SCqOperationParser::GetOperationSCqTypeFromOperationName(std::string const &operationName)
 {
-    std::string lowerOperationName = operationName;
-    std::transform(lowerOperationName.begin(), lowerOperationName.end(), lowerOperationName.begin(),
-                   [](unsigned char c) { return std::tolower(c); });
-
-    if (lowerOperationName == "query")
+    if (queryOperations.find(operationName) != queryOperations.end())
     {
         return SCqNodeType::Query;
     }
-    else if (lowerOperationName == "mutation")
+    else if (mutationOperations.find(operationName) != mutationOperations.end())
     {
         return SCqNodeType::Mutation;
-    }
-    else if (lowerOperationName == "subscription")
-    {
-        return SCqNodeType::Subscription;
     }
     else
     {
@@ -81,27 +65,29 @@ std::shared_ptr<SCqNode> SCqOperationParser::ParseEntity()
     // args for entity fields
     if(context.CurrentToken().type == SCqTokenType::ParenOpen)
     {
+        context.Advance();
         ParseFieldArguments();
+        context.Advance();
     }
 
-    context.ExpectToken(SCqTokenType::CurlyBraceOpen);
-    context.Advance();
-
-    // handle fields for entity
-    while(context.CurrentToken().type != SCqTokenType::CurlyBraceClose)
+    if(context.CurrentToken().type == SCqTokenType::CurlyBraceOpen)
     {
-        entityRoot->children.push_back(ParseField());
-    }
+        context.Advance();
 
-    context.Advance();
+        // handle fields for entity
+        while(context.CurrentToken().type != SCqTokenType::CurlyBraceClose)
+        {
+            entityRoot->children.push_back(ParseField());
+        }
+
+        context.Advance();
+    }
 
     return entityRoot;
 }
 
 void SCqOperationParser::ParseFieldArguments()
 {
-    context.Advance();
-
     while(context.CurrentToken().type != SCqTokenType::ParenClose)
     {
         context.ExpectToken(SCqTokenType::Identifier);
@@ -111,12 +97,41 @@ void SCqOperationParser::ParseFieldArguments()
 
         context.ExpectToken(SCqTokenType::Colon);
         context.Advance();
-        context.ExpectToken(SCqTokenType::StringLiteral);
 
-        std::string argValue = context.CurrentToken().value;
-        context.Advance();
+        if (context.CurrentToken().type == SCqTokenType::SquareBraceOpen)
+        {
+            context.Advance();
 
-        arguments[argName] = argValue;
+            std::vector<std::string> argValues;
+
+            while (context.CurrentToken().type != SCqTokenType::SquareBraceClose)
+            {
+                context.ExpectToken(SCqTokenType::StringLiteral);
+                std::string argValue = context.CurrentToken().value;
+
+                argValues.push_back(argValue);
+
+                context.Advance();
+
+                // skip comma 
+                if(context.CurrentToken().type == SCqTokenType::Comma)
+                {
+                    context.Advance();
+                }
+            }
+
+            arguments[argName] = argValues;
+
+            context.Advance();
+        }
+        else if (context.CurrentToken().type == SCqTokenType::StringLiteral)
+        {
+            std::string argValue = context.CurrentToken().value;
+
+            arguments[argName] = {argValue};
+
+            context.Advance();
+        }
 
         // skip comma 
         if(context.CurrentToken().type == SCqTokenType::Comma)
@@ -124,7 +139,6 @@ void SCqOperationParser::ParseFieldArguments()
             context.Advance();
         }
     }
-    context.Advance();
 }
 
 std::shared_ptr<SCqNode> SCqOperationParser::ParseField()
@@ -146,10 +160,16 @@ std::shared_ptr<SCqNode> SCqOperationParser::ParseField()
 
     auto fieldRoot = std::make_shared<SCqNode>(SCqNodeType::Field, fieldName);
 
+    fieldRoot->children.push_back(std::make_shared<SCqNode>(SCqNodeType::Argument, "ARGUMENT_LIST"));
+
     auto it = arguments.find(fieldName);
     if(it != arguments.end())
     {
-        fieldRoot->children.push_back(std::make_shared<SCqNode>(SCqNodeType::Argument, it->second));
+        for (auto const & argValue : it->second)
+        {
+            auto const arg = std::make_shared<SCqNode>(SCqNodeType::Argument, argValue);
+            fieldRoot->children[0]->children.push_back(arg);
+        }
     }
 
     // check for nested

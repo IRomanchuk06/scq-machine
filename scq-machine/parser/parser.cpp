@@ -3,6 +3,14 @@
 #include "fragment_parser.hpp"
 #include "operation_parser.hpp"
 
+std::unordered_set<std::string> const SCqParser::queryOperations = {
+    "QueryRelatedEntities", "QueryEntityClasses"
+};
+
+std::unordered_set<std::string> const SCqParser::mutationOperations = {
+    "MutationEntityClasses", "MutationRelatedEntities"
+};    
+
 std::shared_ptr<SCqNode> SCqParser::Parse()
 {
     if (context.IsTokensEmpty())
@@ -14,25 +22,42 @@ std::shared_ptr<SCqNode> SCqParser::Parse()
 
     while (!context.IsEnd())
     {
-        if (context.CurrentToken().type == SCqTokenType::Keyword)
-        {
-            std::string tokenValue = context.CurrentToken().value;
-            
-            std::transform(tokenValue.begin(), tokenValue.end(), tokenValue.begin(), ::tolower);
+        auto token = context.CurrentToken();
 
-            if (tokenValue == "query" || tokenValue == "mutation" || tokenValue == "subscription")
-            {
-                SCqOperationParser operationParser(context);
-                root->children.push_back(operationParser.Parse());
-            }
-            else if (tokenValue == "fragment")
+        if (token.type == SCqTokenType::CurlyBraceOpen)
+        {
+            context.Advance();
+        }
+        else if (token.type == SCqTokenType::Keyword)
+        {
+            if (token.value == "fragment")
             {
                 SCqFragmentParser fragmentParser(context);
-                std::shared_ptr<SCqNode> fragment = fragmentParser.Parse();
-                context.AddFragment(fragment->value, fragment);
+
+                auto fragment = fragmentParser.Parse();
+                std::string const & fragmentName = fragment->value;
+
+                context.AddFragment(fragmentName, fragment);
+
+                context.Advance();
+            }
+            else if (queryOperations.find(token.value) != queryOperations.end() || mutationOperations.find(token.value) != mutationOperations.end())
+            {
+                SCqOperationParser operationParser(context);
+
+                root->children.push_back(operationParser.Parse());
+
+                context.Advance();
+            }
+            else
+            {
+                // throw
             }
         }
-
+        else
+        {
+            // throw
+        }
     }
     
     return root;
