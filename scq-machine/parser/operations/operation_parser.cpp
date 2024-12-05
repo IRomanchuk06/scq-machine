@@ -14,10 +14,52 @@ operationType operationName(optional)
 
 */
 
+SCqNodeType SCqOperationParser::GetOperationSCqTypeFromOperationName(std::string const &operationName)
+{
+    if (SCqQuery::operations.find(operationName) != SCqQuery::operations.end())
+    {
+        return SCqNodeType::Query;
+    }
+    else if (SCqMutation::operations.find(operationName) != SCqMutation::operations.end())
+    {
+        return SCqNodeType::Mutation;
+    }
+    else if (SCqSubscription::operations.find(operationName) != SCqSubscription::operations.end())
+    {
+        return SCqNodeType::Subscription;
+    }
+    else
+    {
+        return SCqNodeType::Field;
+    }
+}
+
 std::shared_ptr<SCqNode> SCqOperationParser::Parse()
 {
     context.ExpectToken(SCqTokenType::Keyword);
-    auto operationRoot = std::make_shared<SCqNode>(GetOperationSCqTypeFromOperationName(context.CurrentToken().value));
+
+    SCqNodeType operationType = GetOperationSCqTypeFromOperationName(context.CurrentToken().value);
+
+    std::shared_ptr<SCqNode> operationRoot;
+
+    switch(operationType)
+    {
+        case SCqNodeType::Query: 
+            operationRoot = std::make_shared<SCqQuery>(operationType, context.CurrentToken().value);
+            break;
+
+        case SCqNodeType::Mutation: 
+            operationRoot = std::make_shared<SCqMutation>(operationType, context.CurrentToken().value);
+            break;
+
+        case SCqNodeType::Subscription: 
+            operationRoot = std::make_shared<SCqSubscription>(operationType, context.CurrentToken().value);
+            break;
+
+        default:
+            throw std::invalid_argument("Unsupported SCqNodeType: " + std::to_string(static_cast<int>(operationType)));
+    }
+
     context.Advance(); 
 
     // operation name (optional)
@@ -38,22 +80,6 @@ std::shared_ptr<SCqNode> SCqOperationParser::Parse()
     context.Advance();
 
     return operationRoot;
-}
-
-SCqNodeType SCqOperationParser::GetOperationSCqTypeFromOperationName(std::string const &operationName)
-{
-    if (queryOperations.find(operationName) != queryOperations.end())
-    {
-        return SCqNodeType::Query;
-    }
-    else if (mutationOperations.find(operationName) != mutationOperations.end())
-    {
-        return SCqNodeType::Mutation;
-    }
-    else
-    {
-        return SCqNodeType::Field;
-    }
 }
 
 std::shared_ptr<SCqNode> SCqOperationParser::ParseEntity()

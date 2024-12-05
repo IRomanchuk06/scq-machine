@@ -1,15 +1,7 @@
 #include "parser.hpp"
 
 #include "fragment_parser.hpp"
-#include "operation_parser.hpp"
-
-std::unordered_set<std::string> const SCqParser::queryOperations = {
-    "QueryRelatedEntities", "QueryEntityClasses"
-};
-
-std::unordered_set<std::string> const SCqParser::mutationOperations = {
-    "MutationEntityClasses", "MutationRelatedEntities"
-};    
+#include "operations/operation_parser.hpp"
 
 std::shared_ptr<SCqNode> SCqParser::Parse()
 {
@@ -41,7 +33,7 @@ std::shared_ptr<SCqNode> SCqParser::Parse()
 
                 context.Advance();
             }
-            else if (queryOperations.find(token.value) != queryOperations.end() || mutationOperations.find(token.value) != mutationOperations.end())
+            else if (GetNodeTypeFromOperationName(token.value) == SCqNodeType::Query || GetNodeTypeFromOperationName(token.value) == SCqNodeType::Mutation || GetNodeTypeFromOperationName(token.value) == SCqNodeType::Subscription) 
             {
                 SCqOperationParser operationParser(context);
 
@@ -61,4 +53,22 @@ std::shared_ptr<SCqNode> SCqParser::Parse()
     }
     
     return root;
+}
+
+SCqNodeType SCqParser::GetNodeTypeFromOperationName(std::string const &operationName)
+{
+    if(SCqQuery::operations.find(operationName) != SCqQuery::operations.end())
+    {
+        return SCqNodeType::Query;
+    }
+    else if (SCqMutation::operations.find(operationName) != SCqMutation::operations.end())
+    {
+        return SCqNodeType::Mutation;
+    }
+    else if (SCqSubscription::operations.find(operationName) != SCqSubscription::operations.end())
+    {
+        return SCqNodeType::Subscription;
+    }
+
+    return SCqNodeType::Field;
 }

@@ -16,7 +16,6 @@ enum class SCqNodeType {
     StringLiteral,
     Number,
     Variable,
-    Type
 };
 
 struct SCqNode

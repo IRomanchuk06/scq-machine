@@ -1,8 +1,12 @@
 #pragma once
 
-#include "scq_node.hpp"
-#include "parser_context.hpp"
-#include "parser.hpp"
+#include "../scq_node.hpp"
+#include "../parser_context.hpp"
+#include "../parser.hpp"
+
+#include "scq_query.hpp"
+#include "scq_mutation.hpp"
+#include "scq_subscription.hpp"
 
 #include <algorithm>
 #include <cctype>
