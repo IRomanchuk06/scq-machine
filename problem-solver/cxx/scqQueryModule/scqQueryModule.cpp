@@ -6,7 +6,7 @@
 
 #include "scqQueryModule.hpp"
 
-#include "agents/relationQueryAgent.hpp"
+#include "agents/query/relatedEntitiesAgent.hpp"
 
 SC_MODULE_REGISTER(SCqQueryModule)
-->Agent<RelationQueryAgent>(); 
+->Agent<QueryRelatedEntitiesAgent>(); 
