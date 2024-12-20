@@ -14,7 +14,11 @@ struct SCqQuery : public SCqNode
         QueryRelatedEntities
     };
 
-    static const std::unordered_map<std::string, SCqQueryType> operations;
+    static const std::unordered_map<std::string, SCqQueryType> operationNameToType;
+    static const std::unordered_map<SCqQueryType, std::string> operationTypeToName;
+
+    std::string GetOperationName() const;
+    SCqQueryType GetOperationType () const;
 
     SCqQueryType operationType;
 };

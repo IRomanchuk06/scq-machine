@@ -8,5 +8,8 @@
 
 #include "agents/query/relatedEntitiesAgent.hpp"
 
+#include "agents/generateJSON/generateJSONAgent.hpp"
+
 SC_MODULE_REGISTER(SCqQueryModule)
-->Agent<QueryRelatedEntitiesAgent>(); 
+->Agent<QueryRelatedEntitiesAgent>()
+->Agent<GenerateJSONAgent>(); 

@@ -2,7 +2,7 @@
 
 #include "../resolver/resolver.hpp"
 
-#include <sc-memory/_test/sc_test.hpp>
+#include <sc-memory/test/sc_test.hpp>
 
 class ScResolverTest : public ScMemoryTest
 {
@@ -30,9 +30,11 @@ protected:
     params.dump_memory_statistics = false;
 
     params.clear = false;
-    params.repo_path = "../kb.bin";
+    params.storage = "../kb.bin";
 
-    ScMemory::LogMute();
+    params.user_mode = false;
+
+    ScMemory::LogMute(); // remove for resolver
     ScMemory::Initialize(params);
     ScMemory::LogUnmute();
   }
@@ -40,7 +42,7 @@ protected:
   static void Shutdown()
   {
     ScMemory::LogMute();
-    ScMemory::Shutdown(false);
+    ScMemory::Shutdown(true); // kill
     ScMemory::LogUnmute();
   }
 
@@ -48,29 +50,26 @@ protected:
   std::unique_ptr<ScAgentContext> m_ctx;
 };
 
-/*
-
-TEST_F(ScResolverTest, RudeExample)
+TEST_F(ScResolverTest, CreateArgsStructTest)
 {
-    std::vector<Token> mockTokensQuery = {
-        {SCqTokenType::Keyword, "query"},
-        {SCqTokenType::Identifier, "getUser"},
-        {SCqTokenType::CurlyBraceOpen, "{"},
-        {SCqTokenType::Identifier, "rude_example"},
-        {SCqTokenType::CurlyBraceOpen, "{"},
-        {SCqTokenType::Identifier, "rrel_example1"},
-        {SCqTokenType::Identifier, "rrel_example2"},
-        {SCqTokenType::CurlyBraceClose, "}"},
-        {SCqTokenType::CurlyBraceClose, "}"}
-    };
+  std::string example = "QueryRelatedEntities test1 { entity_test_1 { rrel_example_2_scq { nrel_example_3_scq} nrel_example_1_scq} }";
+  
+  SCqTokenizer tokenizer(example);
+  std::vector<Token> tokens = tokenizer.Tokenize();
 
-    auto context = SCqParserContext(mockTokensQuery);
+  SCqParserContext parserContext(tokens);
 
-    SCqQueryParser parser = SCqQueryParser(context);
-    auto root = parser.Parse();
+  SCqParser parser(parserContext);
+  std::shared_ptr<SCqNode> const root = parser.Parse();
 
-    auto resolver = SCqResolver(root);
-    auto resStr = resolver.Resolve();
+  try {
+    SCqResolver resolver(root);
+    resolver.Resolve();
+  }
+  catch (utils::ScException const & e)
+  {
+    std::cout << e.Description() << std::endl;
+  }
+
+  SC_LOG_DEBUG("FINISH");
 }
-
-*/

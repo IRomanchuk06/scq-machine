@@ -9,15 +9,35 @@
 SCqQuery::SCqQuery(const SCqNodeType &nodeType, std::string const &scqQueryOperationName, std::string const &value):
     SCqNode(nodeType, value)
 {
-    auto it = SCqQuery::operations.find(scqQueryOperationName);
-    if (it != SCqQuery::operations.end()) {
+    auto it = SCqQuery::operationNameToType.find(scqQueryOperationName);
+    if (it != SCqQuery::operationNameToType.end()) {
         operationType = it->second;
     } else {
         throw std::invalid_argument("Invalid operation name: " + scqQueryOperationName);
     }
 }
 
-std::unordered_map<std::string, SCqQuery::SCqQueryType> const SCqQuery::operations = {
+std::string SCqQuery::GetOperationName() const
+{
+    auto it = operationTypeToName.find(this->operationType);
+    if(it != operationTypeToName.end())
+    {
+        return it->second;
+    }
+        return ""; 
+}
+
+SCqQuery::SCqQueryType SCqQuery::GetOperationType() const
+{
+    return this->operationType;
+}
+
+std::unordered_map<SCqQuery::SCqQueryType, std::string> const SCqQuery::operationTypeToName = {
+    {SCqQuery::SCqQueryType::QueryEntityClasses, "QueryEntityClasses"},
+    {SCqQuery::SCqQueryType::QueryRelatedEntities, "QueryRelatedEntities"}
+};
+
+std::unordered_map<std::string, SCqQuery::SCqQueryType> const SCqQuery::operationNameToType = {
     {"QueryEntityClasses", SCqQuery::SCqQueryType::QueryEntityClasses},
     {"QueryRelatedEntities", SCqQuery::SCqQueryType::QueryRelatedEntities}
 };
@@ -28,17 +48,51 @@ SCqMutation::SCqMutation(const SCqNodeType &nodeType, std::string const &scqMuta
     SCqNode(nodeType, value)
 
 {
-    auto it = SCqMutation::operations.find(scqMutationOperationName);
-    if (it != SCqMutation::operations.end()) {
+    auto it = SCqMutation::operationNametoType.find(scqMutationOperationName);
+    if (it != SCqMutation::operationNametoType.end()) {
         operationType = it->second;
     } else {
         throw std::invalid_argument("Invalid operation name: " + scqMutationOperationName);
     }
 }
 
-std::unordered_map<std::string, SCqMutation::SCqMutationType> const SCqMutation::operations = {
+std::string SCqMutation::GetOperationName() const
+{
+    auto it = operationTypeToName.find(this->operationType);
+    if(it != operationTypeToName.end())
+    {
+        return it->second;
+    }
+    return ""; 
+}
+
+SCqMutation::SCqMutationType SCqMutation::GetOperationType() const
+{
+    return this->operationType;
+}
+
+ScKeynode SCqMutation::GetOperationActionClass() const
+{
+    auto it = operationTypeToOperationActionClass.find(GetOperationType());
+    if(it != operationTypeToOperationActionClass.end())
+    {
+        return it->second;
+    }
+    // throw
+}
+
+std::unordered_map<std::string, SCqMutation::SCqMutationType> const SCqMutation::operationNametoType = {
     {"MutationEntityClasses", SCqMutation::SCqMutationType::MutationEntityClasses},
     {"MutationRelatedEntities", SCqMutation::SCqMutationType::MutationRelatedEntities}
+};
+
+std::unordered_map<SCqMutation::SCqMutationType, std::string> const SCqMutation::operationTypeToName = {
+    {SCqMutation::SCqMutationType::MutationEntityClasses, "MutationEntityClasses"},
+    {SCqMutation::SCqMutationType::MutationRelatedEntities, "MutationRelatedEntities"}
+};
+
+std::unordered_map<SCqMutation::SCqMutationType, ScKeynode> const SCqMutation::operationTypeToOperationActionClass = {
+    {SCqMutation::SCqMutationType::MutationRelatedEntities, SCqResolverKeynodes::action_mutation_related_entities}
 };
 
 // Subcription

@@ -2,10 +2,7 @@
 
 #include <sc-memory/sc_agent.hpp>
 
-#include "keynodes/keynodes.hpp"
-
-#include "../../../../../scq-machine/parser/parser.hpp"
-#include "../../../../../scq-machine/resolver/keynodes.hpp"
+#include "keynodes/scq_agents_keynodes.hpp"
 
 
 class QueryRelatedEntitiesAgent : public ScActionInitiatedAgent
@@ -15,5 +12,5 @@ public:
 
   ScResult DoProgram(ScAction & action);
 
-  ScAddr const & FindNodesFromRelsStruct(ScAddr const & entity, ScAddr const & relsStruct, ScAddr const & resultStruct);
+  ScAddr FindNodesFromRelsStruct(ScAddr const & entity, ScAddr const & relsStruct, ScAddr const & resultStruct);
 };

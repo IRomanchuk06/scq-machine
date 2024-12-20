@@ -3,7 +3,7 @@ project(ostis-example-app)
 
 # Set path to sc-machine project
 set(SC_MACHINE_PATH "${CMAKE_CURRENT_LIST_DIR}/ostis-web-platform/sc-machine")
-include("${SC_MACHINE_PATH}/CMakeLists.txt")
+add_subdirectory("${SC_MACHINE_PATH}")
 
 # Set path to scq-machine project
 set(SCQ_MACHINE_PATH "${CMAKE_CURRENT_LIST_DIR}/scq-machine")

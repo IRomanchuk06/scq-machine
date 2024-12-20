@@ -3,7 +3,7 @@
 #include "../parser/parser.hpp" 
 #include "../tokenizer/tokenizer.hpp"
 
-TEST(SCqParserTests, QueryTest)
+TEST(SCqParserTests, MutationRelatedEntities)
 {
     std::string example = "MutationRelatedEntities NAME { ENTITY (REL1 : [\"ARGUMENT1\", \"ARGUMENT2\"], REL2 : \"ARGUMENT3\", REL3 : \"ARGUMENT4\") { REL1 REL2 { REL3	} } }";
     

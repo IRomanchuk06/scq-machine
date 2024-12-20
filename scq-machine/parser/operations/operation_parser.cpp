@@ -16,11 +16,11 @@ operationType operationName(optional)
 
 SCqNodeType SCqOperationParser::GetOperationSCqTypeFromOperationName(std::string const &operationName)
 {
-    if (SCqQuery::operations.find(operationName) != SCqQuery::operations.end())
+    if (SCqQuery::operationNameToType.find(operationName) != SCqQuery::operationNameToType.end())
     {
         return SCqNodeType::Query;
     }
-    else if (SCqMutation::operations.find(operationName) != SCqMutation::operations.end())
+    else if (SCqMutation::operationNametoType.find(operationName) != SCqMutation::operationNametoType.end())
     {
         return SCqNodeType::Mutation;
     }

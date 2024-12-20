@@ -12,7 +12,7 @@ using namespace utils;
 
 ScAddr QueryRelatedEntitiesAgent::GetActionClass() const
 {
-  return Keynodes::action_search_specified_relations;
+  return SCqAgentKeynodes::action_query_related_entities;
 }
 
 ScResult QueryRelatedEntitiesAgent::DoProgram(ScAction & action)
@@ -34,75 +34,73 @@ ScResult QueryRelatedEntitiesAgent::DoProgram(ScAction & action)
   ScAddr const & resultStruct = m_context.GenerateStructure();
   FindNodesFromRelsStruct(entity, relsStruct, resultStruct);
 
-  m_context.GenerateConnector(ScType::EdgeAccessConstPosPerm, action.GetResult(), resultStruct);
+  action.SetResult(resultStruct);
 
   return action.FinishSuccessfully();
 }
 
-ScAddr const &QueryRelatedEntitiesAgent::FindNodesFromRelsStruct(ScAddr const &entity, ScAddr const &relsStruct, ScAddr const & resultStruct)
+ScAddr QueryRelatedEntitiesAgent::FindNodesFromRelsStruct(ScAddr const &entity, ScAddr const &relsStruct, ScAddr const & resultStruct)
 {
-  ScIterator3Ptr it3RelNodes = m_context.CreateIterator3
+  ScIterator5Ptr it5RelNodes = m_context.CreateIterator5
   (
     relsStruct,
     ScType::EdgeAccessConstPosPerm,
-    ScType::NodeConst
+    ScType::NodeConst,
+    ScType::EdgeAccessConstPosPerm, 
+    SCqAgentKeynodes::rrel_scq_argument
   );
 
-  while (it3RelNodes->Next())
+  while (it5RelNodes->Next())
   {
-    ScAddr const & node = it3RelNodes->Get(2); // rel or struct(nested fields)
+    ScAddr const & arg = it5RelNodes->Get(2);
 
-    SC_LOG_DEBUG("1");
-    m_context.GenerateConnector(ScType::EdgeAccessConstPosPerm, resultStruct, node);
-    SC_LOG_DEBUG("1..");
+    ScAddr const & connector = m_context.GenerateConnector(ScType::EdgeAccessConstPosPerm, resultStruct, arg);
+    m_context.GenerateConnector(ScType::EdgeAccessConstPosPerm, SCqAgentKeynodes::rrel_scq_argument, connector);
 
     ScIterator5Ptr it5FindRel = m_context.CreateIterator5
     (
       entity,
-      ScType::EdgeAccess, // -> or =>
+      ScType::Arc, // -> or =>
       ScType::NodeConst,
       ScType::EdgeAccessConstPosPerm,
-      node
+      arg
     );
 
     while(it5FindRel->Next())
     {
-      SC_LOG_DEBUG("2");
-      ScAddr const & connector = m_context.GenerateConnector(ScType::EdgeAccessConstPosPerm, node, it5FindRel->Get(2));
-      SC_LOG_DEBUG("3");
-      m_context.GenerateConnector(ScType::EdgeAccessConstPosPerm, Keynodes::rrel_scq_answer, connector);
+      ScAddr const & connector = m_context.GenerateConnector(ScType::EdgeAccessConstPosPerm, arg, it5FindRel->Get(2));
+      m_context.GenerateConnector(ScType::EdgeAccessConstPosPerm, SCqAgentKeynodes::rrel_scq_answer, connector);
     }
 
-    ScIterator3Ptr it3CheckStruct = m_context.CreateIterator3
+    ScIterator5Ptr it5CheckStruct = m_context.CreateIterator5
     (
-      node,
+      arg,
       ScType::EdgeAccessConstPosPerm,
-      ScType::NodeConstStruct
+      ScType::NodeConstStruct,
+      ScType::EdgeAccessConstPosPerm,
+      SCqAgentKeynodes::rrel_scq_nested
     );
 
-    if(it3CheckStruct->Next())
+    if(it5CheckStruct->Next())
     {
-      SC_LOG_DEBUG("2");
-
       ScIterator5Ptr it5FindAnswers = m_context.CreateIterator5
       (
-        node,
+        arg,
         ScType::EdgeAccessConstPosPerm,
         ScType::NodeConst,
         ScType::EdgeAccessConstPosPerm,
-        Keynodes::rrel_scq_answer
+        SCqAgentKeynodes::rrel_scq_answer
       );
       
       while(it5FindAnswers->Next())
       {
-        ScAddr const& nestedStruct = m_context.GenerateStructure();
-        ScAddr const & connector = m_context.GenerateConnector(ScType::EdgeAccessConstPosPerm, node, FindNodesFromRelsStruct(it5FindAnswers->Get(2), it3CheckStruct->Get(2), nestedStruct));
-        m_context.GenerateConnector(ScType::EdgeAccessConstPosPerm, Keynodes::rrel_scq_nested, connector);
+        ScAddr const& nested = m_context.GenerateStructure(); 
+        ScAddr const& resNested = FindNodesFromRelsStruct(it5FindAnswers->Get(2), it5CheckStruct->Get(2), nested);
+
+        m_context.GenerateConnector(ScType::EdgeAccessConstPosPerm, arg, nested);
       }
     }
   }
-
-  SC_LOG_DEBUG("return");
 
   return resultStruct;
 }

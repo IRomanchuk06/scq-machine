@@ -12,21 +12,32 @@ using namespace utils;
 
 ScAddr MutationRelatedEntitiesAgent::GetActionClass() const
 {
-  return Keynodes::action_mutation_related_entities;
+  return SCqAgentKeynodes::action_mutation_related_entities;
 }
 
 ScResult MutationRelatedEntitiesAgent::DoProgram(ScAction & action)
 {
-  /*
-  ScIterator5Ptr it5CheckRels = m_context.Iterator5
-  (
-    node,
-    ScType::EdgeAccessConstPosPerm,
-    ScType::NodeConst,
-    ScType::EdgeAccessConstPosPerm,
-    SCqKeynodes::rrel_scq_argument_value
-  );
-  */
+  ScAddr const & entity = action.GetArgument(1);
+
+  if(m_context.GetElementType(entity) != ScType::NodeConst)
+  {
+    SC_THROW_EXCEPTION(utils::ExceptionInvalidType, "The first argument must be the node to search for");
+  }
+
+  ScAddr const & relsStruct = action.GetArgument(2);
+
+  if(m_context.GetElementType(relsStruct) != ScType::NodeConstStruct)
+  {
+    SC_THROW_EXCEPTION(utils::ExceptionInvalidType, "The second argument must be a structure containing the sought relations");
+  }
+
+  ScAddr const & resultStruct = m_context.GenerateStructure();
+  BuildRelsForEntity(entity, relsStruct);
 
   return action.FinishSuccessfully();
+}
+
+ScAddr MutationRelatedEntitiesAgent::BuildRelsForEntity(ScAddr const &entity, ScAddr const &relsStruct)
+{
+
 }
