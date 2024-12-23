@@ -5,7 +5,7 @@
 #include "keynodes/scq_agents_keynodes.hpp"
 #include "constantsJSON.hpp"
 
-class GenerateJSONAgent : public ScActionInitiatedAgent
+class GenerateQueryJSONAgent : public ScActionInitiatedAgent
 {
 public:
   ScAddr GetActionClass() const;

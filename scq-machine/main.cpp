@@ -34,7 +34,6 @@ static void Shutdown()
 
 int main()
 {
-    /*
     std::string example = "QueryRelatedEntities test1 { entity_test_1 { rrel_example_2_scq { nrel_example_3_scq} nrel_example_1_scq} }";
 
     SCqTokenizer tokenizer(example);
@@ -63,36 +62,6 @@ int main()
     std::cout << result;
 
     SC_LOG_DEBUG(result);
-    */
-
-    std::string example = "MutationRelatedEntities NAME { ENTITY (REL1 : [\"ARGUMENT1\", \"ARGUMENT2\"], REL2 : \"ARGUMENT3\", REL3 : \"ARGUMENT4\") {REL1 REL2 { REL3	}}}";
-
-    SCqTokenizer tokenizer(example);
-    std::vector<Token> tokens = tokenizer.Tokenize();
-
-    SCqParserContext parserContext(tokens);
-
-    SCqParser parser(parserContext);
-    std::shared_ptr<SCqNode> const root = parser.Parse();
-
-    Initialize();
-
-    std::string result;
-
-    try {
-        SCqResolver resolver(root);
-        result = resolver.Resolve();
-    }
-    catch (utils::ScException const & e)
-    {
-        std::cout << e.Description() << std::endl;
-    }
-
-    Shutdown();
-
-    std::cout << result;
-
-    SC_LOG_DEBUG(result);   
 
     return 0;
 }

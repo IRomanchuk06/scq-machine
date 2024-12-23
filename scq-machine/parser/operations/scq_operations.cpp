@@ -4,6 +4,8 @@
 
 #include <iostream>
 
+#include <sc-memory/sc_debug.hpp>
+
 // Query
 
 SCqQuery::SCqQuery(const SCqNodeType &nodeType, std::string const &scqQueryOperationName, std::string const &value):
@@ -30,6 +32,20 @@ std::string SCqQuery::GetOperationName() const
 SCqQuery::SCqQueryType SCqQuery::GetOperationType() const
 {
     return this->operationType;
+}
+
+ScKeynode SCqQuery::GetOperationActionClass() const
+{
+    std::unordered_map<SCqQuery::SCqQueryType, ScKeynode> const operationTypeToOperationActionClass = {
+        {SCqQuery::SCqQueryType::QueryRelatedEntities, SCqResolverKeynodes::action_query_related_entities}
+    }; // init if not 
+
+    auto it = operationTypeToOperationActionClass.find(GetOperationType());
+    if(it != operationTypeToOperationActionClass.end())
+    {
+        return it->second;
+    }
+    // SC_THROW_EXCEPTION
 }
 
 std::unordered_map<SCqQuery::SCqQueryType, std::string> const SCqQuery::operationTypeToName = {

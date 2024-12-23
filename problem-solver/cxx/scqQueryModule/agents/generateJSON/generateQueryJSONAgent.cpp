@@ -1,4 +1,4 @@
-#include "generateJSONAgent.hpp"
+#include "generateQueryJSONAgent.hpp"
 
 #include <iostream>
 
@@ -11,12 +11,12 @@ using namespace std;
 using namespace utils;
 using namespace JSONConstants;
 
-ScAddr GenerateJSONAgent::GetActionClass() const
+ScAddr GenerateQueryJSONAgent::GetActionClass() const
 {
   return SCqAgentKeynodes::action_generate_json;
 }
 
-ScResult GenerateJSONAgent::DoProgram(ScAction & action)
+ScResult GenerateQueryJSONAgent::DoProgram(ScAction & action)
 {
 	ScAddr const & input = action.GetArgument(1);
 
@@ -68,7 +68,7 @@ ScResult GenerateJSONAgent::DoProgram(ScAction & action)
  	return action.FinishSuccessfully();
 }
 
-std::string GenerateJSONAgent::GenerateAnswer(ScAddr const &relsStruct ,std::string & answerJSON)
+std::string GenerateQueryJSONAgent::GenerateAnswer(ScAddr const &relsStruct ,std::string & answerJSON)
 {
 	ScIterator5Ptr it5RelNodes = m_context.CreateIterator5
 	(
@@ -158,7 +158,7 @@ std::string GenerateJSONAgent::GenerateAnswer(ScAddr const &relsStruct ,std::str
     return answerJSON;
 }
 
-std::string GenerateJSONAgent::AddTabToEachLine(const std::string &input)
+std::string GenerateQueryJSONAgent::AddTabToEachLine(const std::string &input)
 {
     std::istringstream iss(input);
     std::ostringstream oss;
@@ -171,7 +171,7 @@ std::string GenerateJSONAgent::AddTabToEachLine(const std::string &input)
     return oss.str();
 }
 
-std::string GenerateJSONAgent::MakeQuote(std::string const &str) const
+std::string GenerateQueryJSONAgent::MakeQuote(std::string const &str) const
 {
 	return QUOTES + str + QUOTES;
 }
